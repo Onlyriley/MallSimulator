@@ -132,6 +132,8 @@ def draw_main_window(balance, selected_store):
 
     pygame.display.update()
 
+
+
 def main():
     global shoe_store_cost
     shoe_store_cost = 200
