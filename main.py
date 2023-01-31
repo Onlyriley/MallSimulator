@@ -66,7 +66,7 @@ def render_font(text, position):
     text_sprite = GENERAL_FONT.render(str(text), 1, COLOR_BLACK)
     WIN.blit(text_sprite, position)
 
-def draw_main_window(balance, selected_store):
+def draw_main_window(balance, selected_store, shop):
 
     if selected_store == "shoe":
         SHOE_SPRITE = pygame.image.load(os.path.join('Images', 'shoe_selected.png')).convert_alpha()
@@ -110,68 +110,56 @@ def draw_main_window(balance, selected_store):
     WIN.blit(SKATEBOARD, (471, 760))
     WIN.blit(DIAMOND, (600, 765))
 
-    if shoe_store_level >= 1:
+    if shop.shoe_store_level >= 1:
         WIN.blit(SHOESTORE, (15, 125))
-    if shirt_store_level >= 1:
+    if shop.shirt_store_level >= 1:
         WIN.blit(SHIRTSTORE, (450, 125))
-    if pretzel_store_level >= 1:
+    if shop.pretzel_store_level >= 1:
         WIN.blit(PRETZELSTORE, (15, 350))
-    if skate_store_level >= 1:
+    if shop.skate_store_level >= 1:
         WIN.blit(SKATESTORE, (450, 350))
-    if diamond_store_level >= 1:
+    if shop.diamond_store_level >= 1:
         WIN.blit(DIAMONDSTORE, (205, 470))
 
 
     render_font(str('{:,}'.format(round(balance, 2))), (51, 55))
-    render_font(shoe_store_cost, (55, 705))
-    render_font(shirt_store_cost, (215, 705))
-    render_font(pretzel_store_cost, (355, 705))
-    render_font(skate_store_cost, (485, 705))
-    render_font(diamond_store_cost, (610, 705))
+    render_font(shop.shoe_store_cost, (55, 705))
+    render_font(shop.shirt_store_cost, (215, 705))
+    render_font(shop.pretzel_store_cost, (355, 705))
+    render_font(shop.skate_store_cost, (485, 705))
+    render_font(shop.diamond_store_cost, (610, 705))
     render_font(str("$" + str('{:,}'.format(round(rate, 2))) + "/s"), (424, 52))
 
     pygame.display.update()
 
+class Shop():
+    def __init__(self):
+        self.shoe_store_cost = 200
+        self.shoe_store_level = 0
+        self.shoe_store_cooldown = 3
+
+        self.shirt_store_cost = 500
+        self.shirt_store_level = 0
+        self.shirt_store_cooldown = 5
+
+        self.pretzel_store_cost = 1000
+        self.pretzel_store_level = 0
+        self.pretzel_store_cooldown = 7
+
+        self.skate_store_cost = 2000
+        self.skate_store_level = 0
+        self.skate_store_cooldown = 12
+
+        self.diamond_store_cost = 10000
+        self.diamond_store_level = 0
+        self.diamond_store_cooldown = 30
 
 
 def main():
-    global shoe_store_cost
-    shoe_store_cost = 200
-    global shoe_store_level
-    shoe_store_level = 0
-    global shoe_store_cooldown
-    shoe_store_cooldown = 3
-
-    global shirt_store_cost
-    shirt_store_cost = 500
-    global shirt_store_level
-    shirt_store_level = 0
-    global shirt_store_cooldown
-    shirt_store_cooldown = 5
-
-    global pretzel_store_cost
-    pretzel_store_cost = 1000
-    global pretzel_store_level
-    pretzel_store_level = 0
-    global pretzel_store_cooldown
-    pretzel_store_cooldown = 7
-
-    global skate_store_cost
-    skate_store_cost = 2000
-    global skate_store_level
-    skate_store_level = 0
-    global skate_store_cooldown
-    skate_store_cooldown = 12
-
-    global diamond_store_cost
-    diamond_store_cost = 10000
-    global diamond_store_level
-    diamond_store_level = 0
-    global diamond_store_cooldown
-    diamond_store_cooldown = 30
-
     global level
     level = 0
+
+    shop = Shop()
 
     selected_store = ""
 
@@ -189,57 +177,57 @@ def main():
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 run = False
-            if 33 <= mouse[0] <= 156 and 753 <= mouse[1] <= 867 and balance >= shoe_store_cost:
+            if 33 <= mouse[0] <= 156 and 753 <= mouse[1] <= 867 and balance >= shop.shoe_store_cost:
                 selected_store = "shoe"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    shoe_store_level += 1
-                    balance -= shoe_store_cost
-                    shoe_store_cost += (shoe_store_level * 100)
-                    if shoe_store_level > 1:
-                        shoe_store_cooldown - .6
-            elif 186 <= mouse[0] <= 304 and 753 <= mouse[1] <= 867 and balance >= shirt_store_cost:
+                    shop.shoe_store_level += 1
+                    balance -= shop.shoe_store_cost
+                    shop.shoe_store_cost += (shop.shoe_store_level * 100)
+                    if shop.shoe_store_level > 1:
+                        shop.shoe_store_cooldown - .6
+            elif 186 <= mouse[0] <= 304 and 753 <= mouse[1] <= 867 and balance >= shop.shirt_store_cost:
                 selected_store = "shirt"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    shirt_store_level += 1
-                    balance -= shirt_store_cost
-                    shirt_store_cost += (shirt_store_level * 200)
-                    if shirt_store_level > 1:
-                        shirt_store_cooldown - .6
-            elif 333 <= mouse[0] <= 433 and 753 <= mouse[1] <= 867 and balance >= pretzel_store_cost:
+                    shop.shirt_store_level += 1
+                    balance -= shop.shirt_store_cost
+                    shop.shirt_store_cost += (shop.shirt_store_level * 200)
+                    if shop.shirt_store_level > 1:
+                        shop.shirt_store_cooldown - .6
+            elif 333 <= mouse[0] <= 433 and 753 <= mouse[1] <= 867 and balance >= shop.pretzel_store_cost:
                 selected_store = "pretzel"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    pretzel_store_level += 1
-                    balance -= pretzel_store_cost
-                    pretzel_store_cost += (pretzel_store_level * 300)
-                    if pretzel_store_level > 1:
-                        pretzel_store_cooldown - .6
-            elif 469 <= mouse[0] <= 570 and 753 <= mouse[1] <= 867 and balance >= skate_store_cost:
+                    shop.pretzel_store_level += 1
+                    balance -= shop.pretzel_store_cost
+                    shop.pretzel_store_cost += (shop.pretzel_store_level * 300)
+                    if shop.pretzel_store_level > 1:
+                        shop.pretzel_store_cooldown - .6
+            elif 469 <= mouse[0] <= 570 and 753 <= mouse[1] <= 867 and balance >= shop.skate_store_cost:
                 selected_store = "skateboard"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    skate_store_level += 1
-                    balance -= skate_store_cost
-                    skate_store_cost += (skate_store_level * 500)
-                    if skate_store_level > 1:
-                        skate_store_cooldown - .6
-            elif 569 <= mouse[0] <= 690 and 753 <= mouse[1] <= 867 and balance >= diamond_store_cost:
+                    shop.skate_store_level += 1
+                    balance -= shop.skate_store_cost
+                    shop.skate_store_cost += (shop.skate_store_level * 500)
+                    if shop.skate_store_level > 1:
+                        shop.skate_store_cooldown - .6
+            elif 569 <= mouse[0] <= 690 and 753 <= mouse[1] <= 867 and balance >= shop.diamond_store_cost:
                 selected_store = "diamond"
                 if event.type == pygame.MOUSEBUTTONDOWN:
-                    diamond_store_level += 1
-                    balance -= diamond_store_cost
-                    diamond_store_cost += (diamond_store_level * 900)
-                    if diamond_store_level > 1:
-                        diamond_store_cooldown - .6
+                    shop.diamond_store_level += 1
+                    balance -= shop.diamond_store_cost
+                    shop.diamond_store_cost += (shop.diamond_store_level * 900)
+                    if shop.diamond_store_level > 1:
+                        shop.diamond_store_cooldown - .6
             else:
                 selected_store = ""
             
-        rate = (SHOESTORE_BASE_INCOME * (shoe_store_level ** 1.8) / shoe_store_cooldown) + (
-            SHIRTSTORE_BASE_INCOME * (shirt_store_level ** 1.8) / shirt_store_cooldown) + (
-            PRETZELSTORE_BASE_INCOME * (pretzel_store_level ** 1.8) / pretzel_store_cooldown) + (
-            SKATEBOARDSTORE_BASE_INCOME * (skate_store_level ** 1.8) / skate_store_cooldown) + (
-            DIAMONDSTORE_BASE_INCOME * (diamond_store_level ** 1.8) / diamond_store_cooldown)
+        rate = (SHOESTORE_BASE_INCOME * (shop.shoe_store_level ** 1.8) / shop.shoe_store_cooldown) + (
+            SHIRTSTORE_BASE_INCOME * (shop.shirt_store_level ** 1.8) / shop.shirt_store_cooldown) + (
+            PRETZELSTORE_BASE_INCOME * (shop.pretzel_store_level ** 1.8) / shop.pretzel_store_cooldown) + (
+            SKATEBOARDSTORE_BASE_INCOME * (shop.skate_store_level ** 1.8) / shop.skate_store_cooldown) + (
+            DIAMONDSTORE_BASE_INCOME * (shop.diamond_store_level ** 1.8) / shop.diamond_store_cooldown)
 
         balance += rate / 60
-        draw_main_window(balance, selected_store)
+        draw_main_window(balance, selected_store, shop)
 
 main()
         
