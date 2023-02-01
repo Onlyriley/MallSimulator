@@ -1,14 +1,9 @@
 LOGIC
-- Create a method that checks if the mouse is over each button
-- Create a method (or methods) that can level up / manage each store
-- Create a method that calculates the rate of income
-- Remove the current system for managing selected stores (currently very intensive)
 - Create an 'ai' for the people that walk around the store
 
 - Once the game is optimized with the above features, add additional levels (yikes!)
 
 GRAPHICS
-- Create a general graphic that appears over each store if the mouse is over it and you can purchase it
 - Make the balance counter smoother (it is too fast especially when the rate is large)
 - Add people that aimlessly walk around the mall (and visit the stores?)
 - Make the stores clickable (with additional income)
