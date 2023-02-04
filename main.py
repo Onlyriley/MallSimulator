@@ -73,17 +73,25 @@ class Shop():
     def __init__(self):
         pass
     class store():
-        def __init__(self, gain, cost, level, cooldown, x, y):
+        def __init__(self, gain, cost, level, cooldown, x, y, icon_x, icon_y, shop_x, shop_y, text_x, text_y, shop_icon, shop_store):
             self.gain = gain
             self.cost = cost
             self.level = level
             self.cooldown = cooldown
             self.x = x
             self.y = y
+            self.icon_x = icon_x
+            self.icon_y = icon_y
+            self.shop_x = shop_x
+            self.shop_y = shop_y
+            self.text_x = text_x
+            self.text_y = text_y
+            self.shop_icon = shop_icon
+            self.shop_store = shop_store
         def level_up(self):
             self.level += 1
             self.gain += self.gain + (self.level ** 1.2)
-            self.cost += round((self.level ** 1.8) * 100, 0)
+            self.cost = round(self.cost ** 1.07)
             self.cooldown = self.cooldown ** .99
             print(self.gain)
         def select(self):
@@ -94,6 +102,20 @@ class Shop():
                 return round(self.gain / self.cooldown, 0)
             else:
                 return 0
+
+def formatBalance(balance):
+    if balance >= 1000:
+        return "$" + str(round(balance / 1000, 2)) + "k"
+    else:
+        return "$" + str(round(balance, 2))
+
+def init_floor1(Shop):
+    shoe_shop = Shop.store(10, 200, 0, 3, 31, 750, 40, 770, 15, 125, 55, 705, SHOE, SHOESTORE)
+    shirt_shop = Shop.store(25, 500, 0, 5, 185, 750, 199, 760, 450, 125, 215, 705, SHIRT, SHIRTSTORE)
+    pretzel_shop = Shop.store(75, 1000, 0, 7, 322, 750, 339, 765, 15, 350, 355, 705, PRETZEL, PRETZELSTORE)
+    skate_shop = Shop.store(150, 2000, 0, 12, 455, 750, 471, 760, 450, 350, 485, 705, SKATEBOARD, SKATESTORE)
+    diamond_shop = Shop.store(700, 10000, 0, 30, 580, 750, 600, 760, 205, 470, 610, 705, DIAMOND, DIAMONDSTORE)
+    return [shoe_shop, shirt_shop, pretzel_shop, skate_shop, diamond_shop]
 
 def main():
     global level
@@ -106,22 +128,18 @@ def main():
     balance = STARTING_BALANCE
     global rate
     rate = 0
+    floor = 1
 
-    shoe_shop = Shop.store(10, 200, 0, 3, 31, 750)
-    shirt_shop = Shop.store(25, 500, 0, 5, 185, 750)
-    pretzel_shop = Shop.store(75, 1000, 0, 7, 322, 750)
-    skate_shop = Shop.store(150, 2000, 0, 12, 455, 750)
-    diamond_shop = Shop.store(700, 10000, 0, 30, 580, 750)
+
     global shop_list
-    shop_list = [shoe_shop, shirt_shop, pretzel_shop, skate_shop, diamond_shop]
+    shop_list = init_floor1(shop)
 
     while run:
         WIN.blit(BACKGROUND, (0, 0))
-        WIN.blit(SHOE, (40, 770))
-        WIN.blit(SHIRT, (199, 760))
-        WIN.blit(PRETZEL, (339, 765))
-        WIN.blit(SKATEBOARD, (471, 760))
-        WIN.blit(DIAMOND, (600, 765))
+
+        for shop in shop_list:
+            WIN.blit(shop.shop_icon, (shop.icon_x, shop.icon_y))
+
         pygame.time.Clock().tick(FPS)
         tick += 1
         mouse = pygame.mouse.get_pos()
@@ -139,25 +157,16 @@ def main():
                 else:
                     shop.selected = False
 
+        for shop in shop_list:
+            if shop.level >= 1:
+                WIN.blit(shop.shop_store, (shop.shop_x, shop.shop_y))
 
-        if shoe_shop.level >= 1:
-            WIN.blit(SHOESTORE, (15, 125))
-        if shirt_shop.level >= 1:
-            WIN.blit(SHIRTSTORE, (450, 125))
-        if pretzel_shop.level >= 1:
-            WIN.blit(PRETZELSTORE, (15, 350))
-        if skate_shop.level >= 1:
-            WIN.blit(SKATESTORE, (450, 350))
-        if diamond_shop.level >= 1:
-            WIN.blit(DIAMONDSTORE, (205, 470))
 
-        render_font(str('{:,}'.format(round(balance, 2))), (51, 55))
+        render_font((formatBalance(balance)), (51, 55))
         render_font(str("$" + str('{:,}'.format(round(rate, 2))) + "/s"), (424, 52))
-        render_font(shoe_shop.cost, (55, 705))
-        render_font(shirt_shop.cost, (215, 705))
-        render_font(pretzel_shop.cost, (355, 705))
-        render_font(skate_shop.cost, (485, 705))
-        render_font(diamond_shop.cost, (610, 705))
+
+        for shop in shop_list:
+            render_font(shop.cost, (shop.text_x, shop.text_y))
         
             
         rate = 0

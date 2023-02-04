@@ -1,10 +1,9 @@
 LOGIC
 - Create an 'ai' for the people that walk around the store
-
+- Add 'positions' for coordinates rather than manually entering the x and y values for everything
 - Once the game is optimized with the above features, add additional levels (yikes!)
 
 GRAPHICS
-- Make the balance counter smoother (it is too fast especially when the rate is large)
 - Add people that aimlessly walk around the mall (and visit the stores?)
 - Make the stores clickable (with additional income)
 - Add a subtraction (to the balance) notice and an additional (to the rate) notice when you upgrade a shop
