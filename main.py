@@ -73,27 +73,67 @@ class Shop():
     def __init__(self):
         pass
     class store():
-        def __init__(self, gain, cost, level, cooldown, x, y, icon_x, icon_y, shop_x, shop_y, text_x, text_y, shop_icon, shop_store):
+        def __init__(self, gain, cost, level, cooldown, position, shop_icon, shop_store):
             self.gain = gain
             self.cost = cost
             self.level = level
             self.cooldown = cooldown
-            self.x = x
-            self.y = y
-            self.icon_x = icon_x
-            self.icon_y = icon_y
-            self.shop_x = shop_x
-            self.shop_y = shop_y
-            self.text_x = text_x
-            self.text_y = text_y
             self.shop_icon = shop_icon
             self.shop_store = shop_store
+            self.position = position
+            self.find_position()
+        def find_position(self):
+            if self.position == 1:
+                self.x = 31
+                self.y = 750
+                self.icon_x = 40
+                self.icon_y = 770
+                self.shop_x = 15
+                self.shop_y = 125
+                self.text_x = 55
+                self.text_y = 705
+            elif self.position == 2:
+                self.x = 185
+                self.y = 750
+                self.icon_x = 199
+                self.icon_y = 760
+                self.shop_x = 450
+                self.shop_y = 125
+                self.text_x = 215
+                self.text_y = 705
+            elif self.position == 3:
+                self.x = 322
+                self.y = 750
+                self.icon_x = 339
+                self.icon_y = 765
+                self.shop_x = 15
+                self.shop_y = 350
+                self.text_x = 355
+                self.text_y = 705
+            elif self.position == 4:
+                self.x = 455
+                self.y = 750
+                self.icon_x = 471
+                self.icon_y = 760
+                self.shop_x = 450
+                self.shop_y = 350
+                self.text_x = 485
+                self.text_y = 705
+            elif self.position == 5:
+                self.x = 580
+                self.y = 750
+                self.icon_x = 600
+                self.icon_y = 760
+                self.shop_x = 205
+                self.shop_y = 470
+                self.text_x = 610
+                self.text_y = 705
+
         def level_up(self):
             self.level += 1
             self.gain += self.gain + (self.level ** 1.2)
             self.cost = round(self.cost ** 1.07)
             self.cooldown = self.cooldown ** .99
-            print(self.gain)
         def select(self):
             self.selected = True
             #WIN.blit(SELECTED, (self.x, self.y))
@@ -110,11 +150,11 @@ def formatBalance(balance):
         return "$" + str(round(balance, 2))
 
 def init_floor1(Shop):
-    shoe_shop = Shop.store(10, 200, 0, 3, 31, 750, 40, 770, 15, 125, 55, 705, SHOE, SHOESTORE)
-    shirt_shop = Shop.store(25, 500, 0, 5, 185, 750, 199, 760, 450, 125, 215, 705, SHIRT, SHIRTSTORE)
-    pretzel_shop = Shop.store(75, 1000, 0, 7, 322, 750, 339, 765, 15, 350, 355, 705, PRETZEL, PRETZELSTORE)
-    skate_shop = Shop.store(150, 2000, 0, 12, 455, 750, 471, 760, 450, 350, 485, 705, SKATEBOARD, SKATESTORE)
-    diamond_shop = Shop.store(700, 10000, 0, 30, 580, 750, 600, 760, 205, 470, 610, 705, DIAMOND, DIAMONDSTORE)
+    shoe_shop = Shop.store(10, 200, 0, 3, 1, SHOE, SHOESTORE)
+    shirt_shop = Shop.store(25, 500, 0, 5, 2, SHIRT, SHIRTSTORE)
+    pretzel_shop = Shop.store(75, 1000, 0, 7, 3, PRETZEL, PRETZELSTORE)
+    skate_shop = Shop.store(150, 2000, 0, 12, 4, SKATEBOARD, SKATESTORE)
+    diamond_shop = Shop.store(700, 10000, 0, 30, 5, DIAMOND, DIAMONDSTORE)
     return [shoe_shop, shirt_shop, pretzel_shop, skate_shop, diamond_shop]
 
 def main():

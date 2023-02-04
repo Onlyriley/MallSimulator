@@ -1,6 +1,5 @@
 LOGIC
 - Create an 'ai' for the people that walk around the store
-- Add 'positions' for coordinates rather than manually entering the x and y values for everything
 - Once the game is optimized with the above features, add additional levels (yikes!)
 
 GRAPHICS
