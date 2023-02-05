@@ -49,6 +49,27 @@ DIAMONDSTORE = pygame.transform.scale(DIAMONDSTORE_SPRITE, (300, 300))
 SELECTED_SPRITE = pygame.image.load(os.path.join('Images', 'selected.png')).convert_alpha()
 SELECTED = pygame.transform.scale(SELECTED_SPRITE, (124, 124))
 
+PERSON1_SPRITE = pygame.image.load(os.path.join('Images', 'person1.png')).convert_alpha()
+PERSON1 = pygame.transform.scale(PERSON1_SPRITE, (75, 75))
+
+PERSON2_SPRITE = pygame.image.load(os.path.join('Images', 'person2.png')).convert_alpha()
+PERSON2 = pygame.transform.scale(PERSON2_SPRITE, (75, 75))
+
+PERSON3_SPRITE = pygame.image.load(os.path.join('Images', 'person3.png')).convert_alpha()
+PERSON3 = pygame.transform.scale(PERSON3_SPRITE, (75, 75))
+
+PERSON4_SPRITE = pygame.image.load(os.path.join('Images', 'person4.png')).convert_alpha()
+PERSON4 = pygame.transform.scale(PERSON4_SPRITE, (75, 75))
+
+PERSON5_SPRITE = pygame.image.load(os.path.join('Images', 'person5.png')).convert_alpha()
+PERSON5 = pygame.transform.scale(PERSON5_SPRITE, (75, 75))
+
+PERSON6_SPRITE = pygame.image.load(os.path.join('Images', 'person6.png')).convert_alpha()
+PERSON6 = pygame.transform.scale(PERSON6_SPRITE, (75, 75))
+
+PERSON_SPAWN_X = WIDTH / 2
+PERSON_SPAWN_Y = 100
+
 pygame.font.init()
 GENERAL_FONT = pygame.font.SysFont('comicsans', 30)
 
@@ -157,6 +178,58 @@ def init_floor1(Shop):
     diamond_shop = Shop.store(700, 10000, 0, 30, 5, DIAMOND, DIAMONDSTORE)
     return [shoe_shop, shirt_shop, pretzel_shop, skate_shop, diamond_shop]
 
+
+
+def spawn_person():
+    person = pygame.Rect(randint(WIDTH/2 - 50, WIDTH/2 + 50), PERSON_SPAWN_Y, 75, 75)
+    return person
+
+class Person():
+    def __init__(self, person):
+        self.person = person
+        model = randint(1, 6)
+        if model == 1:
+            self.sprite = PERSON1
+        elif model == 2:
+            self.sprite = PERSON2
+        elif model == 3:
+            self.sprite = PERSON3
+        elif model == 4:
+            self.sprite = PERSON4
+        elif model == 5:
+            self.sprite = PERSON5
+        elif model == 6:
+            self.sprite = PERSON6
+        direction = randint(1, 2)
+        if direction == 1:
+            self.right = True
+        else:
+            self.right = False
+
+def draw_people(tick):
+    if randint(0, 300) == 2:
+        person_list.append(Person(spawn_person()))
+
+    for person in person_list:
+
+        if person.person.x <= -50 or person.person.x >= WIDTH:
+            person_list.remove(person)
+            continue
+        if person.person.y >= HEIGHT / 2 - 150:
+            if person.right == True:
+                person.person.x += 2
+            else:
+                person.person.x -= 2
+        else:
+            person.person.y += 2
+
+
+        if tick >= 30 and person.person.y >= HEIGHT / 2 - 150:
+            person.person.y += 1
+        elif person.person.y >= HEIGHT / 2 - 150:
+            person.person.y -= 1
+        WIN.blit(person.sprite, (person.person.x, person.person.y))
+
 def main():
     global level
     level = 0
@@ -169,6 +242,8 @@ def main():
     global rate
     rate = 0
     floor = 1
+    global person_list
+    person_list = []
 
 
     global shop_list
@@ -181,7 +256,9 @@ def main():
             WIN.blit(shop.shop_icon, (shop.icon_x, shop.icon_y))
 
         pygame.time.Clock().tick(FPS)
-        tick += 1
+        tick += 2
+
+
         mouse = pygame.mouse.get_pos()
         mouse_x = mouse[0]
         mouse_y = mouse[1]
@@ -203,10 +280,10 @@ def main():
 
 
         render_font((formatBalance(balance)), (51, 55))
-        render_font(str("$" + str('{:,}'.format(round(rate, 2))) + "/s"), (424, 52))
+        render_font((formatBalance(rate) + "/s"), (424, 52))
 
         for shop in shop_list:
-            render_font(shop.cost, (shop.text_x, shop.text_y))
+            render_font(formatBalance(shop.cost), (shop.text_x, shop.text_y))
         
             
         rate = 0
@@ -215,6 +292,10 @@ def main():
                 rate += (shop.gain / shop.cooldown)
 
         balance += rate / 60
+        if tick >= 60:
+            tick = 0
+        draw_people(tick)
+
         draw_main_window()
 
 main()

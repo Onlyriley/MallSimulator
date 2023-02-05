@@ -1,9 +1,7 @@
 LOGIC
-- Create an 'ai' for the people that walk around the store
 - Once the game is optimized with the above features, add additional levels (yikes!)
 
 GRAPHICS
-- Add people that aimlessly walk around the mall (and visit the stores?)
 - Make the stores clickable (with additional income)
 - Add a subtraction (to the balance) notice and an additional (to the rate) notice when you upgrade a shop
 
