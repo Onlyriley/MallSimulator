@@ -1,4 +1,5 @@
 import pygame
+import pickle
 import os
 from random import randint
 import threading
@@ -85,7 +86,7 @@ def render_font(text, position):
     WIN.blit(text_sprite, position)
 
 def draw_main_window():
-    for shop in shop_list:
+    for shop in game.shop_list:
         if shop.selected:
             WIN.blit(SELECTED, (shop.x, shop.y))
     pygame.display.update()
@@ -152,9 +153,9 @@ class Shop():
 
         def level_up(self):
             self.level += 1
-            self.gain += self.gain + (self.level ** 1.2)
+            self.gain += self.gain
             self.cost = round(self.cost ** 1.07)
-            self.cooldown = self.cooldown ** .99
+            #self.cooldown = self.cooldown ** .99
         def select(self):
             self.selected = True
             #WIN.blit(SELECTED, (self.x, self.y))
@@ -163,26 +164,6 @@ class Shop():
                 return round(self.gain / self.cooldown, 0)
             else:
                 return 0
-
-def formatBalance(balance):
-    if balance >= 1000:
-        return "$" + str(round(balance / 1000, 2)) + "k"
-    else:
-        return "$" + str(round(balance, 2))
-
-def init_floor1(Shop):
-    shoe_shop = Shop.store(10, 200, 0, 3, 1, SHOE, SHOESTORE)
-    shirt_shop = Shop.store(25, 500, 0, 5, 2, SHIRT, SHIRTSTORE)
-    pretzel_shop = Shop.store(75, 1000, 0, 7, 3, PRETZEL, PRETZELSTORE)
-    skate_shop = Shop.store(150, 2000, 0, 12, 4, SKATEBOARD, SKATESTORE)
-    diamond_shop = Shop.store(700, 10000, 0, 30, 5, DIAMOND, DIAMONDSTORE)
-    return [shoe_shop, shirt_shop, pretzel_shop, skate_shop, diamond_shop]
-
-
-
-def spawn_person():
-    person = pygame.Rect(randint(WIDTH/2 - 50, WIDTH/2 + 50), PERSON_SPAWN_Y, 75, 75)
-    return person
 
 class Person():
     def __init__(self, person):
@@ -205,6 +186,36 @@ class Person():
             self.right = True
         else:
             self.right = False
+
+class Gamestate():
+    def __init__(self):
+        self.balance = STARTING_BALANCE
+        self.level = 1
+        self.shop = Shop()
+        self.init_floor1()
+    def init_floor1(self):
+        self.shoe_shop = self.shop.store(10, 200, 0, 3, 1, SHOE, SHOESTORE)
+        self.shirt_shop = self.shop.store(25, 500, 0, 5, 2, SHIRT, SHIRTSTORE)
+        self.pretzel_shop = self.shop.store(75, 1000, 0, 7, 3, PRETZEL, PRETZELSTORE)
+        self.skate_shop = self.shop.store(150, 2000, 0, 12, 4, SKATEBOARD, SKATESTORE)
+        self.diamond_shop = self.shop.store(700, 10000, 0, 30, 5, DIAMOND, DIAMONDSTORE)
+        self.shop_list = [self.shoe_shop, self.shirt_shop, self.pretzel_shop, self.skate_shop, self.diamond_shop]
+    
+class SaveObject():
+    def __init__(self, balance, level, store_levels):
+        self.balance = balance
+        self.level = level
+        self.store_levels = store_levels
+
+def formatBalance(balance):
+    if balance >= 1000:
+        return "$" + str(round(balance / 1000, 2)) + "k"
+    else:
+        return "$" + str(round(balance, 2))
+
+def spawn_person():
+    person = pygame.Rect(randint(WIDTH/2 - 50, WIDTH/2 + 50), PERSON_SPAWN_Y, 75, 75)
+    return person
 
 def draw_people(tick):
     if randint(0, 300) == 2:
@@ -231,28 +242,34 @@ def draw_people(tick):
         WIN.blit(person.sprite, (person.person.x, person.person.y))
 
 def main():
-    global level
-    level = 0
-    shop = Shop()
+    global game
+    game = Gamestate()
+
+    if os.path.exists("Game/data.dictionary"):
+        with open("Game/data.dictionary", "rb") as f:
+            load = pickle.load(f)
+            game.balance = load.balance
+            game.level = load.level
+            counter = 0
+            for store in game.shop_list:
+                for level in range(load.store_levels[counter]):
+                    store.level_up()
+                counter += 1
+
 
     tick = 0
     run = True
-    global balance
-    balance = STARTING_BALANCE
     global rate
     rate = 0
-    floor = 1
     global person_list
     person_list = []
 
 
-    global shop_list
-    shop_list = init_floor1(shop)
 
     while run:
         WIN.blit(BACKGROUND, (0, 0))
 
-        for shop in shop_list:
+        for shop in game.shop_list:
             WIN.blit(shop.shop_icon, (shop.icon_x, shop.icon_y))
 
         pygame.time.Clock().tick(FPS)
@@ -264,34 +281,41 @@ def main():
         mouse_y = mouse[1]
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
+                store_levels = []
+                for store in game.shop_list:
+                    store_levels.append(store.level)
+                save = SaveObject(game.balance, game.level, store_levels)
+                with open("Game/data.dictionary", "wb") as f:
+                    pickle.dump(save, f)
                 run = False
-            for shop in shop_list:
-                if shop.x <= mouse_x <= (shop.x + 124) and shop.y <= mouse_y <= (shop.y + 124) and balance >= shop.cost:
+            for shop in game.shop_list:
+                if shop.x <= mouse_x <= (shop.x + 124) and shop.y <= mouse_y <= (shop.y + 124) and game.balance >= shop.cost:
                     shop.selected = True
                     if event.type == pygame.MOUSEBUTTONDOWN:
-                        balance -= shop.cost
+                        game.balance -= shop.cost
                         shop.level_up()
                 else:
                     shop.selected = False
 
-        for shop in shop_list:
+        for shop in game.shop_list:
             if shop.level >= 1:
                 WIN.blit(shop.shop_store, (shop.shop_x, shop.shop_y))
+                render_font("x" + str(shop.level), (shop.x + 85, shop.y - 10))
 
 
-        render_font((formatBalance(balance)), (51, 55))
+        render_font((formatBalance(game.balance)), (51, 55))
         render_font((formatBalance(rate) + "/s"), (424, 52))
 
-        for shop in shop_list:
+        for shop in game.shop_list:
             render_font(formatBalance(shop.cost), (shop.text_x, shop.text_y))
         
             
         rate = 0
-        for shop in shop_list:
+        for shop in game.shop_list:
             if shop.level > 0:
                 rate += (shop.gain / shop.cooldown)
 
-        balance += rate / 60
+        game.balance += rate / 60
         if tick >= 60:
             tick = 0
         draw_people(tick)
