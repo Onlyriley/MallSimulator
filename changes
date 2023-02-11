@@ -1,5 +1,5 @@
 LOGIC
-- Once the game is optimized with the above features, add additional levels (yikes!)
+- Change the way the people walking around is handled (Maybe threading ?)
 
 GRAPHICS
 - Make the stores clickable (with additional income)
