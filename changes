@@ -1,5 +1,6 @@
 LOGIC
 - Change the way the people walking around is handled (Maybe threading ?)
+- Reorganize the whole thing, the code is getting pretty gross
 
 GRAPHICS
 - Make the stores clickable (with additional income)

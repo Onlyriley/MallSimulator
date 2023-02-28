@@ -5,7 +5,6 @@ from random import randint
 import threading
 from time import sleep
 import math
-import numpy
 WIDTH, HEIGHT = 720, 900
 SHOP_WIDTH, SHOP_HEIGHT = 100, 100
 WIN = pygame.display.set_mode((WIDTH, HEIGHT))
@@ -100,6 +99,37 @@ GLASSESSTORE = pygame.transform.scale(GLASSESSTORE_SPRITE, (250, 250))
 GOLD_SPRITE = pygame.image.load(os.path.join('Images', 'gold.png')).convert_alpha()
 GOLD = pygame.transform.scale(GOLD_SPRITE, (SHOP_WIDTH, SHOP_HEIGHT))
 
+
+ROLLERSKATE_SPRITE = pygame.image.load(os.path.join('Images', 'rollerskate.png')).convert_alpha()
+ROLLERSKATE = pygame.transform.scale(ROLLERSKATE_SPRITE, (SHOP_WIDTH, SHOP_HEIGHT))
+
+ROLLERSKATESTORE_SPRITE = pygame.image.load(os.path.join('Images', 'rollerskate_store.png')).convert_alpha()
+ROLLERSKATESTORE = pygame.transform.scale(ROLLERSKATESTORE_SPRITE, (250, 250))
+
+GAME_SPRITE = pygame.image.load(os.path.join('Images', 'game.png')).convert_alpha()
+GAME = pygame.transform.scale(GAME_SPRITE, (SHOP_WIDTH, SHOP_HEIGHT))
+
+GAMESTORE_SPRITE = pygame.image.load(os.path.join('Images', 'game_store.png')).convert_alpha()
+GAMESTORE = pygame.transform.scale(GAMESTORE_SPRITE, (250, 250))
+
+PET_SPRITE = pygame.image.load(os.path.join('Images', 'pet.png')).convert_alpha()
+PET = pygame.transform.scale(PET_SPRITE, (SHOP_WIDTH, SHOP_HEIGHT))
+
+PETSTORE_SPRITE = pygame.image.load(os.path.join('Images', 'pet_store.png')).convert_alpha()
+PETSTORE = pygame.transform.scale(PETSTORE_SPRITE, (250, 250))
+
+DRUG_SPRITE = pygame.image.load(os.path.join('Images', 'drug.png')).convert_alpha()
+DRUG = pygame.transform.scale(DRUG_SPRITE, (SHOP_WIDTH, SHOP_HEIGHT))
+
+DRUGSTORE_SPRITE = pygame.image.load(os.path.join('Images', 'drug_store.png')).convert_alpha()
+DRUGSTORE = pygame.transform.scale(DRUGSTORE_SPRITE, (250, 250))
+
+WEED_SPRITE = pygame.image.load(os.path.join('Images', 'weed.png')).convert_alpha()
+WEED = pygame.transform.scale(WEED_SPRITE, (SHOP_WIDTH, SHOP_HEIGHT))
+
+WEEDSTORE_SPRITE = pygame.image.load(os.path.join('Images', 'weed_store.png')).convert_alpha()
+WEEDSTORE = pygame.transform.scale(WEEDSTORE_SPRITE, (300, 300))
+
 GOLDSTORE_SPRITE = pygame.image.load(os.path.join('Images', 'gold_store.png')).convert_alpha()
 GOLDSTORE = pygame.transform.scale(GOLDSTORE_SPRITE, (300, 300))
 
@@ -121,7 +151,7 @@ SMALL_FONT = pygame.font.SysFont('comicsans', 25)
 
 COLOR_BLACK = (0, 0, 0)
 
-STARTING_BALANCE = 1000
+STARTING_BALANCE = 100000000000
 
 FPS = 60
 
@@ -277,6 +307,7 @@ class Gamestate():
         self.shop_threashold = 25
         self.init_floor1()
         self.init_floor2()
+        self.init_floor3()
         self.active_shop(1)
         self.upgradable = False
         self.button_list = []
@@ -298,11 +329,22 @@ class Gamestate():
         self.floor2 = [self.pants_shop, self.hat_shop, self.popcorn_shop, self.glasses_shop, self.gold_shop]
         for shop in self.floor2:
             self.shops.append(shop)
+    def init_floor3(self):
+        self.rollerskate_shop = self.shop.store(2000000, 5000000, 0, 150, 1, ROLLERSKATE, ROLLERSKATESTORE)
+        self.game_shop = self.shop.store(5000000, 30000000, 0, 200, 2, GAME, GAMESTORE)
+        self.pet_shop = self.shop.store(10000000, 200000000, 0, 300, 3, PET, PETSTORE)
+        self.drug_shop = self.shop.store(50000000, 1200000000, 0, 500, 4, DRUG, DRUGSTORE)
+        self.weed_shop = self.shop.store(100000000, 8000000000, 0, 1000, 5, WEED, WEEDSTORE)
+        self.floor3 = [self.rollerskate_shop, self.game_shop, self.pet_shop, self.drug_shop, self.weed_shop]
+        for shop in self.floor3:
+            self.shops.append(shop)
     def active_shop(self, floor):
         if floor == 1:
             self.shop_list = [self.shoe_shop, self.shirt_shop, self.pretzel_shop, self.skate_shop, self.diamond_shop]
         if floor == 2:
             self.shop_list = [self.pants_shop, self.hat_shop, self.popcorn_shop, self.glasses_shop, self.gold_shop]
+        if floor == 3:
+            self.shop_list = [self.rollerskate_shop, self.game_shop, self.pet_shop, self.drug_shop, self.weed_shop]
 
 class SaveObject():
     def __init__(self, balance, level, store_levels):
@@ -325,6 +367,8 @@ class Button():
         self.icon = icon
 
 def formatBalance(balance):
+    if balance >= 1000000000:
+        return "$" + str(round(balance / 1000000000, 2)) + "t"
     if balance >= 1000000:
         return "$" + str(round(balance / 1000000, 2)) + "m"
     if balance >= 1000:
@@ -340,7 +384,7 @@ def draw_people(person_list):
     total_levels = 0
     for shop in game.shop_list:
         total_levels += shop.level
-    if randint(0, 200 - int(numpy.cbrt(total_levels * 5000))) == 2:
+    if randint(0, 200 - int(math.pow(total_levels * 5000, 1/3))) == 2:
         person_list.append(Person(spawn_person()))
     for person in person_list:
         if person.person.x <= -50 or person.person.x >= WIDTH:
@@ -371,6 +415,11 @@ def draw_start_screen():
     WIN.blit(START, (0, 0))
     pygame.display.update()
 
+def devConsole():
+    while True:
+        money = input("> ")
+        game.balance += int(money)
+
 def main():
     while True:
         if draw_start_screen() == False:
@@ -390,10 +439,15 @@ def main():
                 counter += 1
     run = True
     global rate
+    button_bounce = False
     person_list = []
     global click_list
     click_list = []
     game.active_shop(1)
+
+    console = threading.Thread(target=devConsole)
+    console.start()
+
     while run:
         pygame.time.Clock().tick(FPS)
         game.tick += 2
@@ -401,6 +455,10 @@ def main():
         mouse_x = mouse[0]
         mouse_y = mouse[1]
         for event in pygame.event.get():
+
+            if event.type == pygame.MOUSEBUTTONUP:
+                button_bounce = False
+
             if event.type == pygame.QUIT:
                 store_levels = []
                 for store in game.shops:
@@ -418,8 +476,9 @@ def main():
                 else:
                     shop.selected = False
             for button in game.button_list:
-                if button.x <= mouse_x <= (button.x + button.width) and button.y <= mouse_y <= (button.y + button.height) and event.type == pygame.MOUSEBUTTONDOWN:
+                if button.x <= mouse_x <= (button.x + button.width) and button.y <= mouse_y <= (button.y + button.height) and event.type == pygame.MOUSEBUTTONDOWN and not button_bounce:
                     person_list = []
+                    button_bounce = True
                     if button.icon == NEXT:
                         game.level += 1
                         game.active_shop(game.level)
